@@ -1,0 +1,60 @@
+# ChronoTrace Phase 3: True Ingestion Pipeline 
+
+Per your diagram, I will remove the `live_stream.py` mock generator entirely. We will pivot to a true **Data Pipeline Architecture** capable of ingesting diverse user-selected files (`.evtx`, `.pcap`, `.log`), normalizing them, running them through a structured detection engine, and pushing the alerts to the interactive dashboard.
+
+## Overview of the Pipeline Architecture
+
+1. **DATA SOURCES:** The frontend will be updated to allow users to select and upload multiple files of different types (`.pcap`, `.evtx`, `.csv`, `.log`).
+2. **LOG INGESTION:** A Python router that detects the file extension and routes it to the specific parser.
+3. **NORMALIZATION:** Standardizing the chaotic output into our `EventLog` schema with UTC timestamps.
+4. **PROCESSING:** Merging the uploaded files and sorting them chronologically.
+5. **DETECTION ENGINE:** Passing the sorted timeline through rule algorithms (Brute Force, Privilege Escalation).
+6. **OUTPUT & VISUALIZATION:** Broadcasting the finalized, categorized events to the interactive UI.
+
+## Proposed Changes
+
+### 1. Removing the Mock (Backend)
+#### [DELETE] `d:\prismatic\kronotrace\live_stream.py`
+- We will completely remove the mock stream.
+
+### 2. The Ingestion Engine (Backend)
+
+#### [NEW] `d:\prismatic\kronotrace\ingestion\parsers.py`
+A new module containing dedicated parsing functions:
+- `parse_csv()`
+- `parse_evtx()` (Using the `python-evtx` library)
+- `parse_pcap()` (Using the `scapy` library to extract basic network flows)
+- `parse_syslog()` (Regex-based parser for `auth.log`/`system.log`)
+
+#### [NEW] `d:\prismatic\kronotrace\ingestion\normalizer.py`
+- Functions to map differing field names (e.g., `TimeCreated` vs `packet.time`) to a unified `Timestamp`, `Source`, `EventID`, `Category`, `Message` schema.
+
+#### [NEW] `d:\prismatic\kronotrace\detection\engine.py`
+An implementation of the diagram's "Rule-Based Detection" box. It will scan the processed timeline for:
+- Brute Force Attacks (e.g., repeating failed login Event IDs)
+- Privilege Escalation
+- File Access Anomalies
+
+### 3. API & WebSockets Updates
+
+#### [MODIFY] `d:\prismatic\kronotrace\api.py`
+- Update the `/api/upload` endpoint to handle arrays of files. Instead of blocking the UI, the endpoint will accept the files and pass them to an asynchronous pipeline task.
+- Ensure the `WebSocket` pushes live "parsing progress" updates, and then pushes the structured timeline batches to the frontend as the detection engine finishes processing them.
+
+### 4. Frontend Revamp
+
+#### [MODIFY] `d:\prismatic\kronotrace\static\index.html` & `app.js`
+- Remove the "Start/Stop" stream buttons.
+- Re-introduce a clean, multi-file drag-and-drop upload zone. 
+- Keep the `Vis.js` timeline and the `DataTable`, but map the newly detected rule-alerts (like "Brute Force Detected") directly to the UI as highlighted threat markers.
+
+## Open Questions
+> [!IMPORTANT]
+> 1. To parse `.pcap` files, I propose using the Python library `scapy` because it installs purely via `pip` and doesn't require the user to have Wireshark/tshark pre-installed. Does this work for you?
+> 2. To parse Windows `.evtx` files natively in Python, I propose using the `python-evtx` library. Do you approve of these two dependency additions?
+
+## Verification Plan
+- Upload a mixed batch of files (e.g., an `.evtx` file and a `.csv` file).
+- Verify the backend successfully routes them to different parsers, normalizes the schema, and merges them.
+- Verify the Detection Engine accurately tags events.
+- Verify the UI populates with the unified timeline.

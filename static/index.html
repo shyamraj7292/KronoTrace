@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KronoTrace — Forensic Log Analysis & Threat Detection</title>
+    <meta name="description" content="Real-time forensic log analysis platform with multi-format ingestion and rule-based threat detection.">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Vis.js Timeline -->
+    <link href="https://unpkg.com/vis-timeline@7.7.3/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vis-timeline@7.7.3/standalone/umd/vis-timeline-graph2d.min.js"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>">
+</head>
+<body>
+    <div id="app">
+        <!-- ═══ Header ═══ -->
+        <header class="header">
+            <div class="header-brand">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" stroke="#00f0ff" stroke-width="2" opacity="0.3"/>
+                        <circle cx="24" cy="24" r="14" stroke="#00f0ff" stroke-width="1.5" opacity="0.5"/>
+                        <circle cx="24" cy="24" r="3" fill="#00f0ff"/>
+                        <line x1="24" y1="10" x2="24" y2="4" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="24" y1="44" x2="24" y2="38" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="10" y1="24" x2="4" y2="24" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="44" y1="24" x2="38" y2="24" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="24" y1="24" x2="32" y2="16" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="24" y1="24" x2="30" y2="30" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <div class="logo-ring"></div>
+                </div>
+                <div class="brand-text">
+                    <h1>KronoTrace</h1>
+                    <div class="subtitle">Forensic Log Analysis & Threat Detection</div>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══ Upload Zone ═══ -->
+        <section class="upload-section">
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-icon">
+                    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="8" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M28 20V36M20 28L28 20L36 28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="8" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="44" y1="8" x2="44" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="upload-title">Drop log files here or click to browse</div>
+                <div class="upload-subtitle">Supports multiple files for cross-source correlation</div>
+                <div class="upload-badges">
+                    <span class="file-badge">.evtx</span>
+                    <span class="file-badge">.pcap</span>
+                    <span class="file-badge">.csv</span>
+                    <span class="file-badge">.log</span>
+                    <span class="file-badge">.txt</span>
+                    <span class="file-badge">.pcapng</span>
+                </div>
+                <input type="file" id="file-input" class="upload-input" multiple
+                       accept=".csv,.evtx,.pcap,.pcapng,.log,.txt,.syslog">
+                <div class="file-list" id="file-list"></div>
+                <div class="upload-btn-container" id="upload-btn-container" style="display:none;">
+                    <button class="btn-primary" id="analyze-btn" onclick="event.stopPropagation(); startAnalysis();">
+                        🔬 Analyze Files
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ Pipeline Progress ═══ -->
+        <section class="progress-section">
+            <div class="pipeline-progress">
+                <div class="pipeline-stages">
+                    <div class="pipeline-stage" data-stage="parsing">
+                        <div class="stage-icon">📥</div>
+                        <div class="stage-label">Parsing</div>
+                    </div>
+                    <div class="pipeline-stage" data-stage="normalization">
+                        <div class="stage-icon">🔄</div>
+                        <div class="stage-label">Normalize</div>
+                    </div>
+                    <div class="pipeline-stage" data-stage="processing">
+                        <div class="stage-icon">⚙️</div>
+                        <div class="stage-label">Process</div>
+                    </div>
+                    <div class="pipeline-stage" data-stage="detection">
+                        <div class="stage-icon">🛡️</div>
+                        <div class="stage-label">Detect</div>
+                    </div>
+                    <div class="pipeline-stage" data-stage="streaming">
+                        <div class="stage-icon">📊</div>
+                        <div class="stage-label">Stream</div>
+                    </div>
+                    <div class="pipeline-stage" data-stage="complete">
+                        <div class="stage-icon">✅</div>
+                        <div class="stage-label">Complete</div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-detail">Initializing pipeline...</div>
+            </div>
+        </section>
+
+        <!-- ═══ Dashboard (shown after analysis) ═══ -->
+        <div class="dashboard">
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card risk animate-in">
+                    <div class="card-header">
+                        <span class="card-label">Risk Score</span>
+                        <span class="card-icon">🎯</span>
+                    </div>
+                    <div class="card-value" id="risk-value">0</div>
+                    <div class="card-subtitle" id="risk-subtitle">Calculating...</div>
+                    <div class="risk-meter">
+                        <div class="risk-meter-fill low" id="risk-meter-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="summary-card events animate-in">
+                    <div class="card-header">
+                        <span class="card-label">Total Events</span>
+                        <span class="card-icon">📋</span>
+                    </div>
+                    <div class="card-value" id="events-value">0</div>
+                    <div class="card-subtitle" id="events-subtitle">—</div>
+                </div>
+                <div class="summary-card alerts animate-in">
+                    <div class="card-header">
+                        <span class="card-label">Threats Found</span>
+                        <span class="card-icon">⚠️</span>
+                    </div>
+                    <div class="card-value" id="alerts-value">0</div>
+                    <div class="card-subtitle" id="alerts-subtitle">—</div>
+                </div>
+                <div class="summary-card files animate-in">
+                    <div class="card-header">
+                        <span class="card-label">Sources</span>
+                        <span class="card-icon">📁</span>
+                    </div>
+                    <div class="card-value" id="files-value">0</div>
+                    <div class="card-subtitle" id="files-subtitle">—</div>
+                </div>
+            </div>
+
+            <!-- Detection Engine Results -->
+            <section class="detection-section">
+                <div class="section-header">
+                    <h2 class="section-title">🛡️ Detection Engine</h2>
+                </div>
+                <div class="detection-grid" id="detection-grid"></div>
+            </section>
+
+            <!-- Alerts -->
+            <section class="alerts-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        ⚠️ Threat Alerts
+                        <span class="section-count" id="alerts-count">0</span>
+                    </h2>
+                </div>
+                <div class="alerts-grid" id="alerts-grid"></div>
+            </section>
+
+            <!-- Timeline -->
+            <section class="timeline-section">
+                <div class="section-header">
+                    <h2 class="section-title">📅 Event Timeline</h2>
+                </div>
+                <div class="timeline-container">
+                    <div id="timeline-vis"></div>
+                </div>
+            </section>
+
+            <!-- Events Table -->
+            <section class="events-section">
+                <div class="section-header">
+                    <h2 class="section-title">📊 Event Log</h2>
+                </div>
+                <div class="table-controls">
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="event-search"
+                               placeholder="Search events by ID, message, IP, user...">
+                    </div>
+                    <select class="filter-select" id="severity-filter">
+                        <option value="all">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                        <option value="info">Info</option>
+                    </select>
+                    <select class="filter-select" id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="authentication">Authentication</option>
+                        <option value="network">Network</option>
+                        <option value="system">System</option>
+                        <option value="file_access">File Access</option>
+                    </select>
+                </div>
+                <div class="events-table-wrapper">
+                    <div class="events-table-scroll">
+                        <table class="events-table">
+                            <thead>
+                                <tr>
+                                    <th data-column="timestamp" onclick="sortTable('timestamp')">Timestamp</th>
+                                    <th data-column="event_id" onclick="sortTable('event_id')">Event ID</th>
+                                    <th data-column="severity" onclick="sortTable('severity')">Severity</th>
+                                    <th data-column="category" onclick="sortTable('category')">Category</th>
+                                    <th data-column="source" onclick="sortTable('source')">Source</th>
+                                    <th data-column="message" onclick="sortTable('message')">Message</th>
+                                    <th>Alerts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-tbody">
+                                <tr>
+                                    <td colspan="7" style="text-align:center;padding:60px;color:var(--text-tertiary);">
+                                        Upload log files to begin analysis
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-pagination">
+                        <div class="pagination-info">—</div>
+                        <div class="pagination-controls"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- App JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

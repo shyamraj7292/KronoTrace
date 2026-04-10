@@ -1,0 +1,101 @@
+timestamp,event_id,severity,category,source_ip,username,message,hostname
+2026-04-10T08:00:59+00:00,4634,info,authentication,10.0.1.50,dba_user,Successful logon from 10.0.1.50 for user dba_user,WS-IT-03
+2026-04-10T08:03:26+00:00,4624,info,authentication,10.0.3.25,dba_user,Successful logon from 10.0.3.25 for user dba_user,SRV-DB-01
+2026-04-10T08:06:51+00:00,4689,info,authentication,192.168.1.10,root,Successful logon from 192.168.1.10 for user root,SRV-DB-01
+2026-04-10T08:07:55+00:00,4624,info,authentication,10.0.1.50,jsmith,Successful logon from 10.0.1.50 for user jsmith,WS-HR-02
+2026-04-10T08:12:56+00:00,4688,info,authentication,192.168.1.10,jsmith,Successful logon from 192.168.1.10 for user jsmith,WS-HR-02
+2026-04-10T08:12:59+00:00,4689,info,authentication,10.0.2.100,jsmith,Successful logon from 10.0.2.100 for user jsmith,WS-IT-03
+2026-04-10T08:14:44+00:00,4624,info,authentication,192.168.1.10,svc_backup,Successful logon from 192.168.1.10 for user svc_backup,WS-FINANCE-01
+2026-04-10T08:16:32+00:00,4689,info,authentication,10.0.1.51,root,Successful logon from 10.0.1.51 for user root,WS-FINANCE-01
+2026-04-10T08:17:27+00:00,4689,info,authentication,10.0.1.51,admin,Successful logon from 10.0.1.51 for user admin,WS-FINANCE-01
+2026-04-10T08:18:38+00:00,4624,info,authentication,10.0.2.100,dba_user,Successful logon from 10.0.2.100 for user dba_user,WS-FINANCE-01
+2026-04-10T08:21:30+00:00,4624,info,authentication,192.168.1.10,root,Successful logon from 192.168.1.10 for user root,SRV-DB-01
+2026-04-10T08:22:19+00:00,4689,info,authentication,10.0.1.50,jsmith,Successful logon from 10.0.1.50 for user jsmith,WS-HR-02
+2026-04-10T08:23:43+00:00,4624,info,authentication,192.168.1.10,dba_user,Successful logon from 192.168.1.10 for user dba_user,WS-FINANCE-01
+2026-04-10T08:23:45+00:00,4689,info,authentication,10.0.1.50,dba_user,Successful logon from 10.0.1.50 for user dba_user,SRV-DC-01
+2026-04-10T08:25:16+00:00,4688,info,authentication,10.0.3.25,dba_user,Successful logon from 10.0.3.25 for user dba_user,SRV-DB-01
+2026-04-10T08:26:38+00:00,4688,info,authentication,10.0.1.50,jsmith,Successful logon from 10.0.1.50 for user jsmith,WS-FINANCE-01
+2026-04-10T08:27:19+00:00,4624,info,authentication,192.168.1.10,svc_backup,Successful logon from 192.168.1.10 for user svc_backup,SRV-DB-01
+2026-04-10T08:28:54+00:00,4688,info,authentication,10.0.1.51,jsmith,Successful logon from 10.0.1.51 for user jsmith,WS-FINANCE-01
+2026-04-10T08:29:08+00:00,4624,info,authentication,192.168.1.10,dba_user,Successful logon from 192.168.1.10 for user dba_user,SRV-DC-01
+2026-04-10T08:29:36+00:00,4688,info,authentication,10.0.1.51,dba_user,Successful logon from 10.0.1.51 for user dba_user,WS-FINANCE-01
+2026-04-10T08:31:52+00:00,4688,info,authentication,10.0.3.25,admin,Successful logon from 10.0.3.25 for user admin,WS-FINANCE-01
+2026-04-10T08:32:11+00:00,4689,info,authentication,10.0.2.100,svc_backup,Successful logon from 10.0.2.100 for user svc_backup,WS-HR-02
+2026-04-10T08:32:30+00:00,4689,info,authentication,10.0.1.50,svc_backup,Successful logon from 10.0.1.50 for user svc_backup,SRV-DC-01
+2026-04-10T08:35:18+00:00,4688,info,authentication,10.0.3.25,jsmith,Successful logon from 10.0.3.25 for user jsmith,SRV-DC-01
+2026-04-10T08:35:35+00:00,4689,info,authentication,10.0.3.25,svc_backup,Successful logon from 10.0.3.25 for user svc_backup,SRV-DC-01
+2026-04-10T08:39:18+00:00,4624,info,authentication,10.0.1.50,admin,Successful logon from 10.0.1.50 for user admin,SRV-DC-01
+2026-04-10T08:41:09+00:00,4624,info,authentication,10.0.3.25,dba_user,Successful logon from 10.0.3.25 for user dba_user,WS-IT-03
+2026-04-10T08:41:30+00:00,4688,info,authentication,192.168.1.10,admin,Successful logon from 192.168.1.10 for user admin,WS-FINANCE-01
+2026-04-10T08:49:53+00:00,4634,info,authentication,10.0.1.50,svc_backup,Successful logon from 10.0.1.50 for user svc_backup,SRV-DC-01
+2026-04-10T08:51:00+00:00,4689,info,authentication,192.168.1.10,svc_backup,Successful logon from 192.168.1.10 for user svc_backup,WS-IT-03
+2026-04-10T08:51:37+00:00,4688,info,authentication,10.0.1.50,dba_user,Successful logon from 10.0.1.50 for user dba_user,SRV-DC-01
+2026-04-10T08:51:41+00:00,4624,info,authentication,192.168.1.10,root,Successful logon from 192.168.1.10 for user root,SRV-DC-01
+2026-04-10T08:53:28+00:00,4624,info,authentication,10.0.1.51,jsmith,Successful logon from 10.0.1.51 for user jsmith,SRV-DB-01
+2026-04-10T08:55:10+00:00,4689,info,authentication,10.0.3.25,admin,Successful logon from 10.0.3.25 for user admin,WS-IT-03
+2026-04-10T08:56:15+00:00,4624,info,authentication,10.0.1.50,dba_user,Successful logon from 10.0.1.50 for user dba_user,WS-FINANCE-01
+2026-04-10T08:57:23+00:00,4624,info,authentication,192.168.1.10,jsmith,Successful logon from 192.168.1.10 for user jsmith,WS-IT-03
+2026-04-10T08:57:47+00:00,4689,info,authentication,192.168.1.10,admin,Successful logon from 192.168.1.10 for user admin,WS-HR-02
+2026-04-10T08:58:02+00:00,4624,info,authentication,10.0.1.51,admin,Successful logon from 10.0.1.51 for user admin,SRV-DC-01
+2026-04-10T08:58:06+00:00,4634,info,authentication,10.0.3.25,dba_user,Successful logon from 10.0.3.25 for user dba_user,SRV-DB-01
+2026-04-10T08:58:33+00:00,4634,info,authentication,10.0.1.51,root,Successful logon from 10.0.1.51 for user root,SRV-DB-01
+2026-04-10T09:23:05+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:11+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:19+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:29+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:32+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:32+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:39+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:23:55+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:08+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:18+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:19+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:30+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:42+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:24:48+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:25:00+00:00,4625,high,authentication,185.220.101.42,admin,Failed logon attempt from 185.220.101.42 for user admin (bad password),SRV-DC-01
+2026-04-10T09:26:00+00:00,4624,info,authentication,185.220.101.42,admin,Successful logon from 185.220.101.42 for user admin,SRV-DC-01
+2026-04-10T09:26:05+00:00,4672,medium,authentication,185.220.101.42,admin,Special privileges assigned to admin from 185.220.101.42,SRV-DC-01
+2026-04-10T09:28:00+00:00,4720,high,system,185.220.101.42,admin,"New user account ""svc_update"" created by admin from 185.220.101.42",SRV-DC-01
+2026-04-10T09:28:30+00:00,4732,high,system,185.220.101.42,admin,"User ""svc_update"" added to Administrators group",SRV-DC-01
+2026-04-10T09:29:00+00:00,4724,high,authentication,185.220.101.42,admin,"Password reset for account ""svc_update""",SRV-DC-01
+2026-04-10T09:31:00+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_1.xlsx,SRV-DC-01
+2026-04-10T09:31:03+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_2.xlsx,SRV-DC-01
+2026-04-10T09:31:06+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_3.xlsx,SRV-DC-01
+2026-04-10T09:31:09+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_4.xlsx,SRV-DC-01
+2026-04-10T09:31:12+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_5.xlsx,SRV-DC-01
+2026-04-10T09:31:15+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_6.xlsx,SRV-DC-01
+2026-04-10T09:31:18+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_7.xlsx,SRV-DC-01
+2026-04-10T09:31:21+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_8.xlsx,SRV-DC-01
+2026-04-10T09:31:24+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_9.xlsx,SRV-DC-01
+2026-04-10T09:31:27+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_10.xlsx,SRV-DC-01
+2026-04-10T09:31:30+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_11.xlsx,SRV-DC-01
+2026-04-10T09:31:33+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_12.xlsx,SRV-DC-01
+2026-04-10T09:31:36+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_13.xlsx,SRV-DC-01
+2026-04-10T09:31:39+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_14.xlsx,SRV-DC-01
+2026-04-10T09:31:42+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_15.xlsx,SRV-DC-01
+2026-04-10T09:31:45+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_16.xlsx,SRV-DC-01
+2026-04-10T09:31:48+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_17.xlsx,SRV-DC-01
+2026-04-10T09:31:51+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_18.xlsx,SRV-DC-01
+2026-04-10T09:31:54+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_19.xlsx,SRV-DC-01
+2026-04-10T09:31:57+00:00,4663,info,file_access,185.220.101.42,admin,Object access: C:\Confidential\financial_report_20.xlsx,SRV-DC-01
+2026-04-10T10:02:00+00:00,4634,info,authentication,10.0.1.50,jsmith,Normal activity from 10.0.1.50 for jsmith,SRV-DB-01
+2026-04-10T10:03:00+00:00,4688,info,authentication,10.0.2.100,root,Normal activity from 10.0.2.100 for root,WS-FINANCE-01
+2026-04-10T10:03:00+00:00,4688,info,authentication,192.168.1.10,svc_backup,Normal activity from 192.168.1.10 for svc_backup,WS-FINANCE-01
+2026-04-10T10:05:00+00:00,4634,info,authentication,10.0.2.100,dba_user,Normal activity from 10.0.2.100 for dba_user,SRV-DC-01
+2026-04-10T10:09:00+00:00,4634,info,authentication,10.0.1.51,jsmith,Normal activity from 10.0.1.51 for jsmith,SRV-DB-01
+2026-04-10T10:14:00+00:00,4624,info,authentication,10.0.2.100,dba_user,Normal activity from 10.0.2.100 for dba_user,WS-FINANCE-01
+2026-04-10T10:15:00+00:00,4688,info,authentication,10.0.1.50,svc_backup,Normal activity from 10.0.1.50 for svc_backup,WS-HR-02
+2026-04-10T10:16:00+00:00,4634,info,authentication,10.0.1.50,jsmith,Normal activity from 10.0.1.50 for jsmith,WS-FINANCE-01
+2026-04-10T10:16:00+00:00,4634,info,authentication,10.0.3.25,jsmith,Normal activity from 10.0.3.25 for jsmith,WS-IT-03
+2026-04-10T10:26:00+00:00,4624,info,authentication,10.0.1.51,jsmith,Normal activity from 10.0.1.51 for jsmith,WS-FINANCE-01
+2026-04-10T10:41:00+00:00,4624,info,authentication,10.0.1.51,jsmith,Normal activity from 10.0.1.51 for jsmith,SRV-DC-01
+2026-04-10T10:42:00+00:00,4624,info,authentication,10.0.1.51,root,Normal activity from 10.0.1.51 for root,WS-FINANCE-01
+2026-04-10T10:46:00+00:00,4634,info,authentication,10.0.2.100,dba_user,Normal activity from 10.0.2.100 for dba_user,WS-HR-02
+2026-04-10T10:48:00+00:00,4624,info,authentication,10.0.1.50,root,Normal activity from 10.0.1.50 for root,WS-HR-02
+2026-04-10T10:49:00+00:00,4624,info,authentication,192.168.1.10,jsmith,Normal activity from 192.168.1.10 for jsmith,WS-HR-02
+2026-04-10T10:49:00+00:00,4634,info,authentication,10.0.1.50,jsmith,Normal activity from 10.0.1.50 for jsmith,WS-IT-03
+2026-04-10T10:50:00+00:00,4624,info,authentication,10.0.1.51,svc_backup,Normal activity from 10.0.1.51 for svc_backup,WS-FINANCE-01
+2026-04-10T10:50:00+00:00,4688,info,authentication,10.0.1.50,jsmith,Normal activity from 10.0.1.50 for jsmith,WS-FINANCE-01
+2026-04-10T10:56:00+00:00,4634,info,authentication,10.0.2.100,root,Normal activity from 10.0.2.100 for root,WS-FINANCE-01
+2026-04-10T10:57:00+00:00,4624,info,authentication,10.0.1.50,dba_user,Normal activity from 10.0.1.50 for dba_user,WS-IT-03
