@@ -225,13 +225,46 @@ def generate_auth_log():
     return filepath
 
 
+def generate_firewall_log():
+    """Generate a firewall log file simulating port scans and DoS floods."""
+    filepath = os.path.join(OUTPUT_DIR, 'firewall.syslog')
+    base_time = datetime(2026, 4, 10, 8, 0, 0)
+    lines = []
+    
+    # Port Scan Activity
+    scan_start = base_time + timedelta(hours=2)
+    src_ip = "192.168.1.100"
+    ports_to_probe = [21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 1433, 1521, 3306, 3389, 5432, 8080, 8443]
+    for i, dpt in enumerate(ports_to_probe):
+        t = scan_start + timedelta(seconds=i * random.uniform(0.1, 1.5))
+        ts_str = t.strftime('%b %d %H:%M:%S')
+        lines.append((t, f"{ts_str} HYPERION-FW1 network[8822]: SRC={src_ip} DST=10.0.0.50 SPT={random.randint(10000, 60000)} DPT={dpt} PROTO=TCP ACTION=DROP MSG=Port scan signature detected"))
+
+    # Volumetric DoS Flood
+    dos_start = base_time + timedelta(hours=3)
+    dos_src = "203.0.113.88"
+    for i in range(600):
+        t = dos_start + timedelta(milliseconds=i * random.uniform(1, 15))
+        ts_str = t.strftime('%b %d %H:%M:%S')
+        lines.append((t, f"{ts_str} HYPERION-FW1 network[9911]: SRC={dos_src} DST=10.0.0.10 SPT={random.randint(10000, 60000)} DPT=80 PROTO=TCP ACTION=ALLOW MSG=Connection SYN arrived"))
+
+    lines.sort(key=lambda x: x[0])
+    with open(filepath, 'w', encoding='utf-8') as f:
+        for _, line in lines:
+            f.write(line + '\n')
+            
+    print(f"[+] Generated {filepath} ({len(lines)} lines)")
+    return filepath
+
 # ─── Generate All ─────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
     print("Generating sample test data for KronoTrace...\n")
     csv_path = generate_security_csv()
     log_path = generate_auth_log()
+    fw_path = generate_firewall_log()
     print(f"\n✅ Sample data ready in {OUTPUT_DIR}/")
     print(f"   - {os.path.basename(csv_path)} (Security events CSV with brute force + privilege escalation)")
     print(f"   - {os.path.basename(log_path)} (auth.log with SSH attack)")
-    print(f"\nUpload both files to KronoTrace to see the full pipeline in action!")
+    print(f"   - {os.path.basename(fw_path)} (firewall syslog with Port Scan and DoS flood)")
+    print(f"\nUpload all files to KronoTrace to see the full pipeline in action!")

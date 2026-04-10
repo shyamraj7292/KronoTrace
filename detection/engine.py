@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional, Set, Tuple
 from collections import defaultdict
 import re
-
+from ingestion.normalizer import EventLog
 
 @dataclass
 class Alert:
@@ -33,7 +33,7 @@ class Alert:
     mitre_technique: str = ''
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        return {k: v for k, v in self.__dict__.items()}
 
 
 def _parse_ts(ts_str: str) -> Optional[datetime]:
@@ -91,9 +91,9 @@ SUCCESS_AUTH_EVENTS = {
 # DETECTOR 1: Brute Force Detection
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_brute_force(events: list, window_seconds: int = 300, threshold: int = 5) -> List[Alert]:
+def detect_brute_force(events: List[EventLog], window_seconds: int = 300, threshold: int = 5) -> List[Alert]:
     alerts = []
-    failed_by_source: Dict[str, List[Tuple[int, Any]]] = defaultdict(list)
+    failed_by_source: Dict[str, List[Tuple[int, EventLog]]] = defaultdict(list)
 
     for idx, event in enumerate(events):
         if event.event_id in FAILED_AUTH_EVENTS or (
@@ -165,9 +165,9 @@ def detect_brute_force(events: list, window_seconds: int = 300, threshold: int =
 # DETECTOR 2: New/Anomalous IP Detection
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_new_ip(events: list) -> List[Alert]:
+def detect_new_ip(events: List[EventLog]) -> List[Alert]:
     alerts = []
-    ip_events: Dict[str, List[Tuple[int, Any]]] = defaultdict(list)
+    ip_events: Dict[str, List[Tuple[int, EventLog]]] = defaultdict(list)
 
     for idx, event in enumerate(events):
         ip = event.source_ip
@@ -224,8 +224,8 @@ def detect_new_ip(events: list) -> List[Alert]:
 # DETECTOR 3: Privilege Escalation
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_privilege_escalation(events: list, escalation_window: int = 600) -> List[Alert]:
-    alerts = []
+def detect_privilege_escalation(events: List[EventLog], escalation_window: int = 600) -> List[Alert]:
+    alerts: List[Alert] = []
 
     # Pattern 1: Failed auth -> Success + Privilege
     for idx, event in enumerate(events):
@@ -308,9 +308,9 @@ def detect_privilege_escalation(events: list, escalation_window: int = 600) -> L
 # DETECTOR 4: File Access Correlation
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_file_access_anomaly(events: list, window_seconds: int = 120, threshold: int = 10) -> List[Alert]:
+def detect_file_access_anomaly(events: List[EventLog], window_seconds: int = 120, threshold: int = 10) -> List[Alert]:
     alerts = []
-    file_events_by_source: Dict[str, List[Tuple[int, Any]]] = defaultdict(list)
+    file_events_by_source: Dict[str, List[Tuple[int, EventLog]]] = defaultdict(list)
 
     for idx, event in enumerate(events):
         is_file_event = (
@@ -373,10 +373,10 @@ def detect_file_access_anomaly(events: list, window_seconds: int = 120, threshol
 # DETECTOR 5: Data Exfiltration Detection
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_data_exfiltration(events: list, bytes_threshold: int = 50000,
+def detect_data_exfiltration(events: List[EventLog], bytes_threshold: int = 50000,
                               packet_threshold: int = 50, window_seconds: int = 300) -> List[Alert]:
     alerts = []
-    flows: Dict[str, Dict] = defaultdict(lambda: {
+    flows: Dict[str, Any] = defaultdict(lambda: {
         'total_bytes': 0, 'packet_count': 0, 'events': [],
         'first_ts': '', 'last_ts': '', 'dst_ip': '', 'src_ip': '',
         'services': set(), 'dns_queries': []
@@ -442,6 +442,125 @@ def detect_data_exfiltration(events: list, bytes_threshold: int = 50000,
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# DETECTOR 6: Port Scan Detection
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_port_scan(events: List[EventLog], unique_ports_threshold: int = 15, window_seconds: int = 60) -> List[Alert]:
+    alerts = []
+    # Track ports accessed by each source IP
+    scan_tracking: Dict[str, List[Tuple[int, EventLog, int]]] = defaultdict(list)
+
+    for idx, event in enumerate(events):
+        if event.category != 'network':
+            continue
+        src = event.source_ip
+        dst_port = event.raw_data.get('dst_port')
+        if not src or not dst_port:
+            continue
+        
+        # We only track traffic to internal IPs or we track all? Usually port scan is looking at our IPs
+        scan_tracking[src].append((idx, event, dst_port))
+
+    for src, accesses in scan_tracking.items():
+        if len(accesses) < unique_ports_threshold:
+            continue
+            
+        i = 0
+        while i < len(accesses):
+            window = [accesses[i]]
+            j = i + 1
+            while j < len(accesses):
+                time_diff = _ts_diff_seconds(accesses[i][1].timestamp, accesses[j][1].timestamp)
+                if time_diff is not None and time_diff <= window_seconds:
+                    window.append(accesses[j])
+                    j += 1
+                else:
+                    break
+            
+            unique_ports = len(set(p for _, _, p in window))
+            if unique_ports >= unique_ports_threshold:
+                first = window[0][1]
+                last = window[-1][1]
+                alerts.append(Alert(
+                    rule_name='port_scan',
+                    severity='high',
+                    title=f'Network Port Scan Detected from {src}',
+                    description=f"Source IP {src} probed {unique_ports} distinct network ports within {window_seconds}s.",
+                    evidence=[f"{e.timestamp} - Probed port {p}" for _, e, p in window[:15]],
+                    timestamp=first.timestamp,
+                    end_timestamp=last.timestamp,
+                    source_ip=src,
+                    target='Multiple Ports',
+                    event_indices=[idx for idx, _, _ in window],
+                    confidence=min(0.6 + (unique_ports - unique_ports_threshold) * 0.05, 0.99),
+                    mitre_tactic='Discovery',
+                    mitre_technique='T1046 - Network Service Discovery',
+                ))
+                i = j
+            else:
+                i += 1
+
+    return alerts
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DETECTOR 7: Denial of Service (DoS) / Flood
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_network_dos(events: List[EventLog], packet_threshold: int = 500, window_seconds: int = 10) -> List[Alert]:
+    alerts = []
+    dos_tracking: Dict[str, List[Tuple[int, EventLog]]] = defaultdict(list)
+
+    for idx, event in enumerate(events):
+        if event.category == 'network' and event.source_ip:
+            dos_tracking[event.source_ip].append((idx, event))
+
+    for src, accesses in dos_tracking.items():
+        if len(accesses) < packet_threshold:
+            continue
+            
+        i = 0
+        while i < len(accesses):
+            window = [accesses[i]]
+            j = i + 1
+            while j < len(accesses):
+                time_diff = _ts_diff_seconds(accesses[i][1].timestamp, accesses[j][1].timestamp)
+                if time_diff is not None and time_diff <= window_seconds:
+                    window.append(accesses[j])
+                    j += 1
+                else:
+                    break
+            
+            if len(window) >= packet_threshold:
+                first = window[0][1]
+                last = window[-1][1]
+                
+                # Check target distribution
+                targets = set(e.dest_ip for _, e in window if e.dest_ip)
+                target_str = f"{len(targets)} distinct targets" if len(targets) > 1 else (list(targets)[0] if targets else "unknown target")
+                
+                alerts.append(Alert(
+                    rule_name='dos_flood',
+                    severity='critical',
+                    title=f'Volumetric DoS Flood from {src}',
+                    description=f"Source IP {src} transmitted {len(window)} packets in {window_seconds}s targeting {target_str}.",
+                    evidence=[f"{e.timestamp} - Packet to {e.dest_ip or e.raw_data.get('dst_ip')}" for _, e in window[:10]],
+                    timestamp=first.timestamp,
+                    end_timestamp=last.timestamp,
+                    source_ip=src,
+                    target=target_str,
+                    event_indices=[idx for idx, _ in window],
+                    confidence=0.90,
+                    mitre_tactic='Impact',
+                    mitre_technique='T1498 - Network Denial of Service',
+                ))
+                i = j
+            else:
+                i += 1
+
+    return alerts
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Event Correlation Module — Orchestrator
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -453,7 +572,7 @@ class EventCorrelationModule:
         self.alerts: List[Alert] = []
         self.summary: Dict[str, Any] = {}
 
-    def analyze(self, events: list) -> Tuple[list, List[Alert], Dict]:
+    def analyze(self, events: List[EventLog]) -> Tuple[List[EventLog], List[Alert], Dict[str, Any]]:
         all_alerts = []
 
         all_alerts.extend(detect_brute_force(
@@ -476,6 +595,16 @@ class EventCorrelationModule:
             bytes_threshold=self.config.get('exfil_bytes_threshold', 50000),
             packet_threshold=self.config.get('exfil_packet_threshold', 50),
         ))
+        all_alerts.extend(detect_port_scan(
+            events,
+            unique_ports_threshold=self.config.get('port_scan_threshold', 15),
+            window_seconds=self.config.get('port_scan_window', 60),
+        ))
+        all_alerts.extend(detect_network_dos(
+            events,
+            packet_threshold=self.config.get('dos_packet_threshold', 500),
+            window_seconds=self.config.get('dos_window', 10),
+        ))
 
         # Annotate events with their alerts
         for alert in all_alerts:
@@ -489,11 +618,11 @@ class EventCorrelationModule:
         self.summary = summary
         return events, all_alerts, summary
 
-    def _build_summary(self, events: list, alerts: List[Alert]) -> Dict:
-        severity_counts = defaultdict(int)
-        category_counts = defaultdict(int)
-        rule_counts = defaultdict(int)
-        source_ip_counts = defaultdict(int)
+    def _build_summary(self, events: List[EventLog], alerts: List[Alert]) -> Dict[str, Any]:
+        severity_counts: Dict[str, int] = defaultdict(int)
+        category_counts: Dict[str, int] = defaultdict(int)
+        rule_counts: Dict[str, int] = defaultdict(int)
+        source_ip_counts: Dict[str, int] = defaultdict(int)
 
         for event in events:
             severity_counts[event.severity] += 1
@@ -513,6 +642,33 @@ class EventCorrelationModule:
             {'critical': 30, 'high': 15, 'medium': 5}.get(a.severity, 1) for a in alerts
         ))
 
+        # ---- Calculate IP Risk Scoring (Flagged IPs) ----
+        ip_event_frequency: Dict[str, int] = defaultdict(int)
+        ip_threat_score: Dict[str, int] = defaultdict(int)
+        
+        for event in events:
+            if event.source_ip and event.source_ip not in ('-', 'unknown', 'N/A', '', '127.0.0.1', '::1', '0.0.0.0'):
+                ip_event_frequency[event.source_ip] += 1
+                
+        for alert in alerts:
+            if alert.source_ip:
+                points = {'critical': 30, 'high': 15, 'medium': 5, 'low': 1}.get(alert.severity, 0)
+                ip_threat_score[alert.source_ip] += int(points * alert.confidence)
+
+        flagged_ips = []
+        for ip, score in ip_threat_score.items():
+            if score > 0:
+                level = 'critical' if score >= 50 else 'high' if score >= 20 else 'medium' if score >= 5 else 'low'
+                flagged_ips.append({
+                    'ip': ip,
+                    'frequency': ip_event_frequency.get(ip, 0),
+                    'score': score,
+                    'level': level
+                })
+                
+        # Sort flagged IPs by score descending
+        flagged_ips.sort(key=lambda x: x['score'], reverse=True)
+
         return {
             'total_events': len(events),
             'total_alerts': len(alerts),
@@ -523,4 +679,5 @@ class EventCorrelationModule:
             'time_range': time_range,
             'top_attackers': [{'ip': ip, 'alert_count': cnt} for ip, cnt in top_attackers],
             'source_files': list(set(e.source_file for e in events if e.source_file)),
+            'flagged_ips': flagged_ips
         }

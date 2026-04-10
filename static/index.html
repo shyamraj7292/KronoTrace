@@ -157,6 +157,16 @@
                 </div>
             </div>
 
+            <!-- Flagged IPs Section -->
+            <section class="flagged-ips-section animate-in" id="flagged-ips-section" style="display:none; margin-bottom: 24px;">
+                <div class="section-header">
+                    <h2 class="section-title">🛑 High-Risk Flagged IPs</h2>
+                </div>
+                <div class="flagged-ips-container" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;" id="flagged-ips-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
             <!-- Detection Engine Results -->
             <section class="detection-section">
                 <div class="section-header">
@@ -196,6 +206,10 @@
                         <input type="text" class="search-input" id="event-search"
                                placeholder="Search events by ID, message, IP, user...">
                     </div>
+                    <select class="filter-select" id="attack-filter">
+                        <option value="all">All Attacks</option>
+                        <!-- Populated dynamically -->
+                    </select>
                     <select class="filter-select" id="severity-filter">
                         <option value="all">All Severities</option>
                         <option value="critical">Critical</option>

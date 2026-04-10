@@ -14,6 +14,7 @@ const state = {
     currentPage: 1,
     pageSize: 50,
     searchTerm: '',
+    attackFilter: 'all',
     severityFilter: 'all',
     categoryFilter: 'all',
     sortColumn: 'timestamp',
@@ -165,9 +166,11 @@ function onPipelineComplete() {
         $('.dashboard').classList.add('active');
         updateStatusDot('online');
         renderSummaryCards();
+        renderFlaggedIPs();
         renderAlerts();
         renderDetectionCards();
         renderTimeline();
+        populateAttackFilter();
         renderEventsTable();
         const btn = $('#analyze-btn');
         btn.disabled = false;
@@ -210,6 +213,42 @@ function renderSummaryCards() {
     if (alertsVal) alertsVal.textContent = s.total_alerts || 0;
     const filesVal = $('#files-value');
     if (filesVal) filesVal.textContent = (s.source_files || []).length;
+}
+
+// ─── Flagged IPs ─────────────────────────────────────────────────────────────
+
+function renderFlaggedIPs() {
+    const container = $('#flagged-ips-container');
+    const section = $('#flagged-ips-section');
+    if (!container || !section) return;
+
+    const flagged = state.summary.flagged_ips || [];
+    if (flagged.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    
+    // Sort criticals first, then high
+    container.innerHTML = flagged.map((f, i) => `
+        <div class="flagged-ip-card animate-in ${f.level}" style="animation-delay: ${i * 0.05}s">
+            <div class="f-ip-header">
+                <span class="f-ip-address">${escapeHtml(f.ip)}</span>
+                <span class="f-ip-badge ${f.level}">${f.level.toUpperCase()}</span>
+            </div>
+            <div class="f-ip-stats">
+                <div class="f-ip-stat">
+                    <span class="label">Threat Score</span>
+                    <span class="value">${f.score}</span>
+                </div>
+                <div class="f-ip-stat">
+                    <span class="label">Log Frequency</span>
+                    <span class="value">${f.frequency.toLocaleString()}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
 
 // ─── Alerts Panel ────────────────────────────────────────────────────────────
@@ -332,10 +371,41 @@ function renderTimeline() {
 function setupTableControls() {
     const searchInput = $('#event-search');
     if (searchInput) searchInput.addEventListener('input', (e) => { state.searchTerm = e.target.value.toLowerCase(); state.currentPage = 1; renderEventsTable(); });
+    const attackFilter = $('#attack-filter');
+    if (attackFilter) attackFilter.addEventListener('change', (e) => { state.attackFilter = e.target.value; state.currentPage = 1; renderEventsTable(); });
     const severityFilter = $('#severity-filter');
     if (severityFilter) severityFilter.addEventListener('change', (e) => { state.severityFilter = e.target.value; state.currentPage = 1; renderEventsTable(); });
     const categoryFilter = $('#category-filter');
     if (categoryFilter) categoryFilter.addEventListener('change', (e) => { state.categoryFilter = e.target.value; state.currentPage = 1; renderEventsTable(); });
+}
+
+function populateAttackFilter() {
+    const attackFilter = $('#attack-filter');
+    if (!attackFilter) return;
+    
+    // Extract unique rule names from current alerts
+    const rules = [...new Set(state.alerts.map(a => a.rule_name))];
+    
+    // Build options ensuring "all" is first and preserved
+    let html = '<option value="all">All Attacks</option>';
+    
+    const ruleLabels = {
+        'brute_force': 'Brute Force',
+        'new_ip': 'New IP',
+        'privilege_escalation': 'Privilege Escalation',
+        'file_access_anomaly': 'File Access Anomaly',
+        'data_exfiltration': 'Data Exfiltration',
+        'port_scan': 'Port Scan',
+        'dos_flood': 'DoS Flood'
+    };
+
+    rules.forEach(rule => {
+        const label = ruleLabels[rule] || rule.replace(/_/g, ' ');
+        html += `<option value="${rule}">${escapeHtml(label)}</option>`;
+    });
+    
+    attackFilter.innerHTML = html;
+    attackFilter.value = state.attackFilter;
 }
 
 function getFilteredEvents() {
@@ -349,6 +419,11 @@ function getFilteredEvents() {
             (e.source || '').toLowerCase().includes(state.searchTerm)
         );
     }
+    
+    if (state.attackFilter !== 'all') {
+        filtered = filtered.filter(e => e.alerts && e.alerts.some(a => a.rule_name === state.attackFilter));
+    }
+    
     if (state.severityFilter !== 'all') filtered = filtered.filter(e => e.severity === state.severityFilter);
     if (state.categoryFilter !== 'all') filtered = filtered.filter(e => e.category === state.categoryFilter);
     filtered.sort((a, b) => {
