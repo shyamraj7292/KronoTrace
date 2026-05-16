@@ -353,6 +353,30 @@ body::after {
 .detection-card.active .det-count { color: var(--red); }
 .detection-card.clear .det-count { color: var(--green); }
 
+/* ─── Attacker Analysis ─── */
+.attacker-section { margin-bottom: 28px; }
+.attacker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.attacker-card {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg); padding: 20px; transition: all var(--transition-normal);
+    backdrop-filter: blur(12px);
+}
+.attacker-card:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+.attacker-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+.attacker-identity-group { display: flex; flex-direction: column; gap: 2px; }
+.attacker-ip { font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: var(--cyan); }
+.attacker-subname { font-size: 0.75rem; color: var(--text-secondary); font-family: var(--font-mono); opacity: 0.8; }
+.attacker-total { font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; }
+.attacker-types { display: flex; flex-wrap: wrap; gap: 8px; }
+.attack-type-tag {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px;
+    background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+    border-radius: 8px; font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
+}
+.attack-type-tag .count { font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
+.attack-type-tag.critical { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+.attack-type-tag.high { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
     #app { padding: 0 12px 24px; }

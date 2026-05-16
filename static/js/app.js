@@ -166,6 +166,7 @@ function onPipelineComplete() {
         updateStatusDot('online');
         renderSummaryCards();
         renderAlerts();
+        renderAttackerAnalysis();
         renderDetectionCards();
         renderTimeline();
         renderEventsTable();
@@ -252,6 +253,73 @@ function renderAlerts() {
 }
 
 function toggleAlertEvidence(card) { card.classList.toggle('expanded'); }
+
+// ─── Attacker Analysis ────────────────────────────────────────────────────────
+
+function renderAttackerAnalysis() {
+    const container = $('#attacker-grid');
+    if (!container) return;
+
+    if (state.alerts.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">🛡️</div><div class="empty-text">No attacker patterns identified</div></div>';
+        return;
+    }
+
+    // Group alerts by Source Identity (Process + IP)
+    const attackerMap = {};
+    state.alerts.forEach(alert => {
+        const ip = alert.source_ip || '';
+        const process = alert.process || '';
+        
+        // Identity key: process preferred, IP secondary
+        // In Kronos, we prioritize the AI-detected process name
+        const identityKey = process ? `${process}::${ip}` : ip || 'Internal/Unknown';
+        
+        if (!attackerMap[identityKey]) {
+            attackerMap[identityKey] = { 
+                identity: identityKey, 
+                displayName: process || ip || 'Internal/Unknown', 
+                subName: (process && ip && ip !== '-') ? ip : '',
+                ip: ip,
+                process: process,
+                types: {}, 
+                total: 0, 
+                maxSeverity: 'low' 
+            };
+        }
+        
+        const type = alert.title || alert.rule_name;
+        attackerMap[identityKey].types[type] = (attackerMap[identityKey].types[type] || 0) + 1;
+        attackerMap[identityKey].total++;
+        
+        const severityWeight = { critical: 3, high: 2, medium: 1, low: 0 };
+        if (severityWeight[alert.severity] > (severityWeight[attackerMap[identityKey].maxSeverity] || 0)) {
+            attackerMap[identityKey].maxSeverity = alert.severity;
+        }
+    });
+
+    const attackers = Object.values(attackerMap).sort((a, b) => b.total - a.total);
+
+    container.innerHTML = attackers.map((attacker, i) => `
+        <div class="attacker-card animate-in" style="animation-delay: ${i * 0.1}s">
+            <div class="attacker-info">
+                <div class="attacker-identity-group">
+                    <div class="attacker-ip">${escapeHtml(attacker.displayName)}</div>
+                    ${attacker.subName ? `<div class="attacker-subname">${escapeHtml(attacker.subName)}</div>` : ''}
+                </div>
+                <div class="attacker-total">${attacker.total} Flagged Events</div>
+            </div>
+            <div class="attacker-types">
+                ${Object.entries(attacker.types).map(([type, count]) => `
+                    <div class="attack-type-tag ${attacker.maxSeverity}">
+                        <span class="label">${escapeHtml(type)}</span>
+                        <span class="count">${count}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
 
 // ─── Detection Cards ─────────────────────────────────────────────────────────
 
@@ -369,7 +437,7 @@ function renderEventsTable() {
     if (!tbody) return;
 
     if (pageEvents.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-tertiary);">No events match your filters</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-tertiary);">No events match your filters</td></tr>';
     } else {
         tbody.innerHTML = pageEvents.map(event => {
             const hasAlert = event.alerts && event.alerts.length > 0;
@@ -380,6 +448,7 @@ function renderEventsTable() {
                 <td><span class="category-tag ${event.category}">${event.category}</span></td>
                 <td>${escapeHtml(event.source || '')}</td>
                 <td title="${escapeHtml(event.message)}">${escapeHtml(event.message.substring(0, 100))}</td>
+                <td class="details" style="font-size: 0.95em; font-weight: 500; color: #ffffff;">${escapeHtml(event.details || '')}</td>
                 <td>${hasAlert ? `<span class="alert-indicator">${event.alerts.length}</span>` : ''}</td>
             </tr>`;
         }).join('');

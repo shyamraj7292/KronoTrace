@@ -15,29 +15,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Any
 
-from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect, HTTPException
-from fastapi.staticfiles import StaticFiles
+from fastapi import APIRouter, UploadFile, File, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 
 from ingestion.parsers import parse_file, get_supported_extensions, SUPPORTED_EXTENSIONS
 from ingestion.normalizer import normalize_records, merge_and_sort, EventLog
 from detection.engine import EventCorrelationModule
 
-# ─── App Setup ────────────────────────────────────────────────────────────────
+# ─── Router Setup ─────────────────────────────────────────────────────────────
 
-app = FastAPI(
-    title="KronoTrace",
-    description="Forensic Log Analysis & Threat Detection Platform",
-    version="3.0.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter()
 
 pipelines: Dict[str, Dict] = {}
 ws_connections: Dict[str, List[WebSocket]] = {}
@@ -46,11 +33,9 @@ UPLOAD_DIR = Path(tempfile.gettempdir()) / "kronotrace_uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 STATIC_DIR = Path(__file__).parent / "static"
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
-@app.get("/", response_class=HTMLResponse)
+@router.get("/api/index", response_class=HTMLResponse)
 async def index():
     index_path = STATIC_DIR / "index.html"
     if index_path.exists():
@@ -58,7 +43,7 @@ async def index():
     return HTMLResponse("<h1>KronoTrace - Static files not found</h1>")
 
 
-@app.get("/api/info")
+@router.get("/api/info")
 async def api_info():
     return {
         "name": "KronoTrace",
@@ -71,7 +56,7 @@ async def api_info():
     }
 
 
-@app.post("/api/upload")
+@router.post("/api/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
@@ -119,7 +104,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
     }
 
 
-@app.get("/api/status/{pipeline_id}")
+@router.get("/api/status/{pipeline_id}")
 async def get_pipeline_status(pipeline_id: str):
     if pipeline_id not in pipelines:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -132,7 +117,7 @@ async def get_pipeline_status(pipeline_id: str):
     }
 
 
-@app.get("/api/results/{pipeline_id}")
+@router.get("/api/results/{pipeline_id}")
 async def get_pipeline_results(pipeline_id: str):
     if pipeline_id not in pipelines:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -147,7 +132,7 @@ async def get_pipeline_results(pipeline_id: str):
 
 # ─── WebSocket ────────────────────────────────────────────────────────────────
 
-@app.websocket("/ws/{pipeline_id}")
+@router.websocket("/ws/{pipeline_id}")
 async def websocket_endpoint(websocket: WebSocket, pipeline_id: str):
     await websocket.accept()
     if pipeline_id not in ws_connections:

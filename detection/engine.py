@@ -27,6 +27,7 @@ class Alert:
     end_timestamp: str = ''
     source_ip: str = ''
     target: str = ''
+    process: str = ''
     event_indices: List[int] = field(default_factory=list)
     confidence: float = 0.0
     mitre_tactic: str = ''
@@ -100,7 +101,7 @@ def detect_brute_force(events: list, window_seconds: int = 300, threshold: int =
             event.category == 'authentication' and
             any(w in event.message.lower() for w in ['failed', 'failure', 'denied', 'invalid'])
         ):
-            source_key = event.source_ip or event.username or 'unknown'
+            source_key = event.process or event.source_ip or event.username or 'unknown'
             if source_key not in ('unknown', '-', 'N/A'):
                 failed_by_source[source_key].append((idx, event))
 
@@ -147,8 +148,9 @@ def detect_brute_force(events: list, window_seconds: int = 300, threshold: int =
                     evidence=[f"{e.timestamp} - {e.event_id}: {e.message[:80]}" for _, e in window_events[:10]],
                     timestamp=first_event.timestamp,
                     end_timestamp=last_event.timestamp,
-                    source_ip=source,
+                    source_ip=last_event.source_ip or '',
                     target=target_user or 'unknown',
+                    process=first_event.process or '',
                     event_indices=[idx for idx, _ in window_events],
                     confidence=min(0.5 + (len(window_events) - threshold) * 0.1, 1.0),
                     mitre_tactic='Credential Access',
@@ -170,9 +172,9 @@ def detect_new_ip(events: list) -> List[Alert]:
     ip_events: Dict[str, List[Tuple[int, Any]]] = defaultdict(list)
 
     for idx, event in enumerate(events):
-        ip = event.source_ip
-        if ip and ip not in ('', 'N/A', '-', '127.0.0.1', '::1', '0.0.0.0'):
-            ip_events[ip].append((idx, event))
+        source = event.process or event.source_ip
+        if source and source not in ('', 'N/A', '-', '127.0.0.1', '::1', '0.0.0.0'):
+            ip_events[source].append((idx, event))
 
     if not ip_events:
         return alerts
@@ -209,8 +211,9 @@ def detect_new_ip(events: list) -> List[Alert]:
                 ),
                 evidence=[f"{e.timestamp} - {e.event_id}: {e.message[:80]}" for _, e in priv_actions[:10]],
                 timestamp=first_event.timestamp,
-                source_ip=ip,
+                source_ip=first_event.source_ip or '',
                 target=first_event.hostname or first_event.username or '',
+                process=first_event.process or '',
                 event_indices=[idx for idx, _ in priv_actions],
                 confidence=min(0.6 + (len(priv_actions) * 0.15), 0.95),
                 mitre_tactic='Initial Access',
@@ -231,7 +234,7 @@ def detect_privilege_escalation(events: list, escalation_window: int = 600) -> L
     for idx, event in enumerate(events):
         if event.event_id not in FAILED_AUTH_EVENTS:
             continue
-        source = event.source_ip or event.username
+        source = event.process or event.source_ip or event.username
         if not source or source in ('-', 'N/A', 'unknown'):
             continue
 
@@ -239,7 +242,7 @@ def detect_privilege_escalation(events: list, escalation_window: int = 600) -> L
         privilege_event = None
         for j in range(idx + 1, min(idx + 200, len(events))):
             future = events[j]
-            future_source = future.source_ip or future.username
+            future_source = future.process or future.source_ip or future.username
             time_diff = _ts_diff_seconds(event.timestamp, future.timestamp)
             if time_diff is not None and time_diff > escalation_window:
                 break
@@ -266,8 +269,9 @@ def detect_privilege_escalation(events: list, escalation_window: int = 600) -> L
                 ],
                 timestamp=event.timestamp,
                 end_timestamp=privilege_event[1].timestamp,
-                source_ip=event.source_ip,
+                source_ip=event.source_ip or '',
                 target=event.username or success_event[1].username or '',
+                process=privilege_event[1].process or event.process or '',
                 event_indices=[idx, success_event[0], privilege_event[0]],
                 confidence=0.85,
                 mitre_tactic='Privilege Escalation',
@@ -294,6 +298,7 @@ def detect_privilege_escalation(events: list, escalation_window: int = 600) -> L
                     evidence=[f"{e.timestamp} - {e.event_id}: {e.message[:60]}" for _, e in window],
                     timestamp=window[0][1].timestamp,
                     end_timestamp=window[-1][1].timestamp,
+                    process=window[0][1].process or '',
                     event_indices=[idx for idx, _ in window],
                     confidence=0.75,
                     mitre_tactic='Persistence',
@@ -355,8 +360,9 @@ def detect_file_access_anomaly(events: list, window_seconds: int = 120, threshol
                     evidence=[f"{e.timestamp} - {e.event_id}: {e.message[:80]}" for _, e in window[:10]],
                     timestamp=first.timestamp,
                     end_timestamp=last.timestamp,
-                    source_ip=first.source_ip,
+                    source_ip=first.source_ip or '',
                     target=source,
+                    process=first.process or '',
                     event_indices=[idx for idx, _ in window],
                     confidence=min(0.6 + (len(window) - threshold) * 0.05, 0.95),
                     mitre_tactic='Collection' if not is_ransomware_like else 'Impact',
@@ -391,7 +397,7 @@ def detect_data_exfiltration(events: list, bytes_threshold: int = 50000,
             continue
 
         if _is_private_ip(src) and not _is_private_ip(dst):
-            flow_key = f"{src}->{dst}"
+            flow_key = f"{event.process or 'unknown'}@{src}->{dst}"
             flow = flows[flow_key]
             flow['total_bytes'] += event.raw_data.get('payload_size', 0) or 0
             flow['packet_count'] += 1
@@ -430,12 +436,55 @@ def detect_data_exfiltration(events: list, bytes_threshold: int = 50000,
                 evidence=[f"{e.timestamp} - {e.message[:80]}" for _, e in flow['events'][:10]],
                 timestamp=flow['first_ts'],
                 end_timestamp=flow['last_ts'],
-                source_ip=flow['src_ip'],
+                source_ip=flow['src_ip'] or '',
                 target=flow['dst_ip'],
+                process=flow['events'][0][1].process or '',
                 event_indices=[idx for idx, _ in flow['events']],
                 confidence=min(0.5 + len(reasons) * 0.2, 0.95),
                 mitre_tactic='Exfiltration',
                 mitre_technique='T1048 - Exfiltration Over Alternative Protocol',
+            ))
+
+    return alerts
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DETECTOR 6: AI-Driven Anomaly Detection
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_ai_threat(events: list) -> List[Alert]:
+    alerts = []
+    
+    # MITRE Mapping for AI detected threats
+    mitre_map = {
+        'sql_injection': ('Initial Access', 'T1190 - Exploit Public-Facing Application'),
+        'xss': ('Initial Access', 'T1190 - Exploit Public-Facing Application'),
+        'path_traversal': ('Initial Access', 'T1083 - File and Directory Discovery'),
+        'command_injection': ('Execution', 'T1059 - Command and Scripting Interpreter')
+    }
+
+    for idx, event in enumerate(events):
+        ai_threat = event.raw_data.get('_ai_threat')
+        if ai_threat and ai_threat != 'benign':
+            tactic, technique = mitre_map.get(ai_threat, ('Suspicious Activity', 'AI Anomaly'))
+            
+            alerts.append(Alert(
+                rule_name='ai_anomaly',
+                severity='critical' if ai_threat in ['sql_injection', 'command_injection'] else 'high',
+                title=f'AI Detection: {ai_threat.replace("_", " ").title()}',
+                description=(
+                    f"Machine Learning model identified a highly suspicious {ai_threat.replace('_', ' ')} "
+                    f"pattern in the log message from {event.process or event.source_ip or 'unknown'}."
+                ),
+                evidence=[f"RAW: {event.message}"],
+                timestamp=event.timestamp,
+                source_ip=event.source_ip or '',
+                target=event.raw_data.get('application_name') or event.hostname or '',
+                process=event.process or '',
+                event_indices=[idx],
+                confidence=0.9,
+                mitre_tactic=tactic,
+                mitre_technique=technique,
             ))
 
     return alerts
@@ -476,6 +525,7 @@ class EventCorrelationModule:
             bytes_threshold=self.config.get('exfil_bytes_threshold', 50000),
             packet_threshold=self.config.get('exfil_packet_threshold', 50),
         ))
+        all_alerts.extend(detect_ai_threat(events))
 
         # Annotate events with their alerts
         for alert in all_alerts:
@@ -493,21 +543,22 @@ class EventCorrelationModule:
         severity_counts = defaultdict(int)
         category_counts = defaultdict(int)
         rule_counts = defaultdict(int)
-        source_ip_counts = defaultdict(int)
-
+        attacker_counts = defaultdict(int)
+ 
         for event in events:
             severity_counts[event.severity] += 1
             category_counts[event.category] += 1
-
+ 
         for alert in alerts:
             rule_counts[alert.rule_name] += 1
-            if alert.source_ip:
-                source_ip_counts[alert.source_ip] += 1
+            attrib_source = alert.process or alert.source_ip
+            if attrib_source:
+                attacker_counts[attrib_source] += 1
 
         timestamps = [e.timestamp for e in events if e.timestamp]
         time_range = {'start': min(timestamps), 'end': max(timestamps)} if timestamps else {}
-
-        top_attackers = sorted(source_ip_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+ 
+        top_attackers = sorted(attacker_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
         risk_score = min(100, sum(
             {'critical': 30, 'high': 15, 'medium': 5}.get(a.severity, 1) for a in alerts

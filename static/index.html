@@ -7,7 +7,7 @@
     <meta name="description" content="Real-time forensic log analysis platform with multi-format ingestion and rule-based threat detection.">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
     <!-- Vis.js Timeline -->
     <link href="https://unpkg.com/vis-timeline@7.7.3/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
@@ -165,6 +165,14 @@
                 <div class="detection-grid" id="detection-grid"></div>
             </section>
 
+            <!-- Attacker Analysis -->
+            <section class="attacker-section">
+                <div class="section-header">
+                    <h2 class="section-title">🕵️ Attacker Analysis</h2>
+                </div>
+                <div class="attacker-grid" id="attacker-grid"></div>
+            </section>
+
             <!-- Alerts -->
             <section class="alerts-section">
                 <div class="section-header">
@@ -223,12 +231,13 @@
                                     <th data-column="category" onclick="sortTable('category')">Category</th>
                                     <th data-column="source" onclick="sortTable('source')">Source</th>
                                     <th data-column="message" onclick="sortTable('message')">Message</th>
+                                    <th data-column="details" onclick="sortTable('details')">Details</th>
                                     <th>Alerts</th>
                                 </tr>
                             </thead>
                             <tbody id="events-tbody">
                                 <tr>
-                                    <td colspan="7" style="text-align:center;padding:60px;color:var(--text-tertiary);">
+                                    <td colspan="8" style="text-align:center;padding:60px;color:var(--text-tertiary);">
                                         Upload log files to begin analysis
                                     </td>
                                 </tr>
@@ -245,6 +254,6 @@
     </div>
 
     <!-- App JS -->
-    <script src="/static/js/app.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

