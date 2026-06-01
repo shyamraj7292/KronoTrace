@@ -65,4 +65,3 @@ Want to see the pipeline catch a real attack?
 4. Watch the pipeline normalize the data and surface the critical threats directly onto the dashboard!
 
 ---
-*Developed for DEVTrails 2026.*
